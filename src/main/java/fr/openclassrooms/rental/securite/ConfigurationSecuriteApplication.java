@@ -33,7 +33,11 @@ public class ConfigurationSecuriteApplication {
                                         authorize
                                                 .requestMatchers(POST,"/auth/register").permitAll()
                                                 .requestMatchers(GET,"/auth/test").permitAll()
-                                                .requestMatchers(POST,"/auth/email").permitAll()
+                                                .requestMatchers(POST,"/auth/login").permitAll()
+                                                .requestMatchers(POST,"/auth/me").permitAll()
+                                                .requestMatchers(POST, "/rentals/**").permitAll()
+                                                .requestMatchers(GET, "/rentals/**").permitAll()
+                                                .requestMatchers( GET, "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                                                 .anyRequest().authenticated()
                         )
                         .sessionManagement(httpSecuritySessionManagementConfigurer ->

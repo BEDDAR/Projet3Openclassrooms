@@ -14,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.management.remote.JMXAuthenticator;
@@ -22,7 +23,7 @@ import java.util.Map;
 @Slf4j
 @AllArgsConstructor
 @RestController
-@RequestMapping(path = "/auth", consumes = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/auth")
 public class UtilisateurController {
     private UtilisateurService utilisateurService;
     private AuthenticationManager authenticationManager;
@@ -45,15 +46,38 @@ public class UtilisateurController {
         }
     }
 
-    @PostMapping(path = "email")
+    @PostMapping(path = "login")
     public Map<String, String> connexion(@RequestBody AuthentificationDTO authentificationDTO) {
         final Authentication authenticate = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authentificationDTO.login(), authentificationDTO.password())
+                new UsernamePasswordAuthenticationToken(authentificationDTO.email(), authentificationDTO.password())
         );
     log.info("resultat {}",authenticate.isAuthenticated());
        if(authenticate.isAuthenticated()) {
-            return this.jwtService.generate(authentificationDTO.login());
+            return this.jwtService.generate(authentificationDTO.email());
         }
         return null;
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<?> getMe(@RequestHeader("Authorization") String authHeader) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token non fourni ou invalide");
+        }
+
+        String token = authHeader.substring(7);
+        UserDetails userDetails;
+        // Validez le token
+        if (!jwtService.isTokenGloballyValid(token) ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token invalide");
+        }
+
+        // Extrait le nom d'utilisateur du token
+        String username = jwtService.extractUsername(token);
+
+        // Récupère les informations utilisateur
+        Utilisateur utilisateur = utilisateurService.loadUserByUsername(username);
+
+        return ResponseEntity.ok(utilisateur);
     }
 }

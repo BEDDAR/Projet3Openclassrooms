@@ -3,10 +3,7 @@ package fr.openclassrooms.rental.securite;
 import fr.openclassrooms.rental.controller.UtilisateurController;
 import fr.openclassrooms.rental.entite.Utilisateur;
 import fr.openclassrooms.rental.service.UtilisateurService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.MalformedJwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.AllArgsConstructor;
@@ -95,8 +92,24 @@ public class JwtService {
     /**
      * Vérifie si un token est valide en le comparant avec les détails d'utilisateur.
      */
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean isTokenValidForUser(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    public boolean isTokenGloballyValid (String token) {
+        try {
+            // Parse the token and check the signature using the signing key
+            Jwts.parserBuilder()
+                    .setSigningKey(getKey()) // Provide the signing key
+                    .build()
+                    .parseClaimsJws(token); // Parse and validate the token
+            return true; // Token is valid
+        } catch (JwtException | IllegalArgumentException e) {
+            // Handle different validation exceptions
+            System.out.println("Invalid JWT: " + e.getMessage());
+            return false; // Token is invalid
+        }
+    }
+
 }

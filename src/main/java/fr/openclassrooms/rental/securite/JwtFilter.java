@@ -15,7 +15,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import io.jsonwebtoken.MalformedJwtException;
 
 import java.io.IOException;
 
@@ -35,8 +34,13 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String requestPath = request.getServletPath();
+        String requestURI = request.getRequestURI();
+        System.out.println(requestPath);
+        System.out.println(requestURI);
+
         // Exclure les routes publiques
-        if (requestPath.equals("/auth/register") || requestPath.equals("/auth/email")|| requestPath.equals("/auth/test")) {
+        if (requestPath.equals("/auth/register") || requestPath.equals("/auth/login")|| requestPath.equals("/auth/test")||
+                requestPath.startsWith("/swagger-ui") || requestPath.startsWith("/v3/api-docs") || requestPath.equals("/swagger-ui.html")) {
             filterChain.doFilter(request, response); // Continuer sans appliquer le filtre
             return;
         }
@@ -56,7 +60,7 @@ public class JwtFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
+            if (jwtService.isTokenValidForUser(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
