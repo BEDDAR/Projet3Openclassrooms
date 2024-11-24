@@ -20,6 +20,15 @@ public class Rental {
     private String name;
     private String surface;
     private String price;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @Lob
     private String picture;
     @Lob

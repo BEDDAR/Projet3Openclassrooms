@@ -1,11 +1,13 @@
 package fr.openclassrooms.rental.service;
 
+import fr.openclassrooms.rental.dto.RentalDTO;
 import fr.openclassrooms.rental.entite.Rental;
 import fr.openclassrooms.rental.entite.Utilisateur;
 import fr.openclassrooms.rental.repository.RentalRepository;
 import fr.openclassrooms.rental.repository.UtilisateurRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,5 +29,23 @@ public class RentalService {
 
     public List<Rental> getAllRentals (){
         return rentalRepository.findAll();
+    }
+
+    public RentalDTO convertToDTO(Rental rental) {
+        RentalDTO rentalDTO = new RentalDTO();
+        rentalDTO.setId(rental.getId());
+        rentalDTO.setName(rental.getName());
+        rentalDTO.setSurface(rental.getSurface());
+        rentalDTO.setPrice(rental.getPrice());
+        rentalDTO.setPicture(rental.getPicture());
+        rentalDTO.setDescription(rental.getDescription());
+        rentalDTO.setOwner_id(rental.getUtilisateur().getId());
+
+        return rentalDTO;
+    }
+
+    public Rental getRentalById (Integer id){
+        return rentalRepository.findById(id)
+                .orElseThrow(() -> new UsernameNotFoundException("Aucun logement ne corespond à cet identifiant"));
     }
 }

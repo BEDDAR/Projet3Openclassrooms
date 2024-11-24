@@ -28,6 +28,15 @@ public class Utilisateur implements UserDetails {
     private String password;
     private String name;
     private String email;
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
     @OneToOne(cascade = CascadeType.ALL)
     private Role role;
 

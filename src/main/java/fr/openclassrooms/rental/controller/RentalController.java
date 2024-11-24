@@ -1,5 +1,6 @@
 package fr.openclassrooms.rental.controller;
 
+import fr.openclassrooms.rental.dto.RentalDTO;
 import fr.openclassrooms.rental.entite.Rental;
 import fr.openclassrooms.rental.service.RentalService;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/rentals")
@@ -49,7 +52,29 @@ public class RentalController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Rental>> getRentals(){
-        return ResponseEntity.status(HttpStatus.OK).body(rentalService.getAllRentals());
+    public ResponseEntity<List<RentalDTO>> getRentals() {
+        List<Rental> rentals = rentalService.getAllRentals();
+
+        if (rentals != null && !rentals.isEmpty()) {
+            // Utilisation de map pour transformer chaque Rental en RentalDTO et collecter le résultat dans une liste
+            List<RentalDTO> rentalsDto = rentals.stream()
+                    .map(rental -> rentalService.convertToDTO(rental)) // Convertit chaque Rental en RentalDTO
+                    .collect(Collectors.toList()); // Rassemble le résultat dans une nouvelle liste
+
+            return ResponseEntity.status(HttpStatus.OK).body(rentalsDto);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
+    @GetMapping("/{id_rental}")
+    public ResponseEntity<RentalDTO> getRentalById(@PathVariable("id_rental") Integer idRental) {
+        Rental rental = rentalService.getRentalById(idRental);
+
+        if (rental != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(rentalService.convertToDTO(rental));
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 }
