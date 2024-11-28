@@ -1,5 +1,6 @@
 package fr.openclassrooms.rental.dto;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class RentalDTO {
@@ -11,8 +12,8 @@ public class RentalDTO {
     private String picture;
     private String description;
     private Integer owner_id;
-    private Date created_at;
-    private Date updated_at;
+    private LocalDateTime created_at;
+    private LocalDateTime updated_at;
 
     public Integer getId() {
         return id;
@@ -70,19 +71,19 @@ public class RentalDTO {
         this.owner_id = owner_id;
     }
 
-    public Date getCreated_at() {
+    public LocalDateTime getCreated_at() {
         return created_at;
     }
 
-    public void setCreated_at(Date created_at) {
+    public void setCreated_at(LocalDateTime created_at) {
         this.created_at = created_at;
     }
 
-    public Date getUpdated_at() {
+    public LocalDateTime getUpdated_at() {
         return updated_at;
     }
 
-    public void setUpdated_at(Date updated_at) {
+    public void setUpdated_at(LocalDateTime updated_at) {
         this.updated_at = updated_at;
     }
 }

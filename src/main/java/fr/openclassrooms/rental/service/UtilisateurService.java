@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 @AllArgsConstructor
@@ -39,6 +40,8 @@ public class UtilisateurService implements UserDetailsService {
         Role roleUtilisateur = new Role();
         roleUtilisateur.setLibelle(TypeDeRole.UTILISATEUR);
         utilisateur.setRole(roleUtilisateur);
+        utilisateur.setCreated_at(LocalDateTime.now());
+        utilisateur.setUpdated_at(LocalDateTime.now());
         this.utilisateurRepository.save(utilisateur);
     }
 

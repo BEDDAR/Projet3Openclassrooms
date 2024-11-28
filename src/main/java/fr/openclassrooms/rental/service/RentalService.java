@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @AllArgsConstructor
@@ -24,6 +25,8 @@ public class RentalService {
         Utilisateur utilisateur = utilisateurRepository.findById(idUtilisateur)
                 .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
         rental.setUtilisateur(utilisateur);
+        rental.setCreated_at(LocalDateTime.now());
+        rental.setUpdated_at(LocalDateTime.now());
         return rentalRepository.save(rental);
     }
 
@@ -40,6 +43,8 @@ public class RentalService {
         rentalDTO.setPicture(rental.getPicture());
         rentalDTO.setDescription(rental.getDescription());
         rentalDTO.setOwner_id(rental.getUtilisateur().getId());
+        rentalDTO.setCreated_at(rental.getCreated_at());
+        rentalDTO.setUpdated_at(rental.getUpdated_at());
 
         return rentalDTO;
     }

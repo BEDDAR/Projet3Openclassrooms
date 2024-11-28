@@ -2,10 +2,15 @@ package fr.openclassrooms.rental.controller;
 
 import fr.openclassrooms.rental.dto.RentalDTO;
 import fr.openclassrooms.rental.entite.Rental;
+import fr.openclassrooms.rental.entite.Utilisateur;
+import fr.openclassrooms.rental.models.RentalsResponse;
+import fr.openclassrooms.rental.securite.JwtService;
 import fr.openclassrooms.rental.service.RentalService;
+import fr.openclassrooms.rental.service.UtilisateurService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -19,19 +24,41 @@ import java.util.stream.Collectors;
 public class RentalController {
 
     private final RentalService rentalService;
+    private UtilisateurService utilisateurService;
+    private JwtService jwtService;
 
-    public RentalController(RentalService rentalService) {
+    public RentalController(RentalService rentalService,UtilisateurService utilisateurService,JwtService jwtService) {
         this.rentalService = rentalService;
+        this.utilisateurService =utilisateurService;
+        this.jwtService=jwtService;
     }
 
-    @PostMapping(value = "/{id_utilisateur}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Rental> createRental(
-            @PathVariable("id_utilisateur") Integer idUtilisateur,
+            @RequestHeader("Authorization") String authHeader,
             @RequestParam("name") String name,
             @RequestParam("surface") String surface,
             @RequestParam("price") String price,
             @RequestParam("description") String description,
             @RequestParam("picture") MultipartFile imageFile) {
+
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        String token = authHeader.substring(7);
+        UserDetails userDetails;
+        // Validez le token
+        if (!jwtService.isTokenGloballyValid(token) ){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+
+        // Extrait le nom d'utilisateur du token
+        String username = jwtService.extractUsername(token);
+
+        // Récupère les informations utilisateur
+        Utilisateur utilisateur = utilisateurService.loadUserByUsername(username);
 
         Rental rental = new Rental();
         rental.setName(name);
@@ -42,26 +69,30 @@ public class RentalController {
         try {
             byte[] imageBytes = imageFile.getBytes();
             String base64Image = java.util.Base64.getEncoder().encodeToString(imageBytes);
-            rental.setPicture(base64Image); // Enregistrement dans le champ `picture`
+            rental.setPicture("data:image/png;base64,".concat(base64Image)); // Enregistrement dans le champ `picture`
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
 
-        Rental createdRental = rentalService.createRentalForUser(idUtilisateur, rental);
+        Rental createdRental = rentalService.createRentalForUser(utilisateur.getId(), rental);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdRental);
     }
 
-    @GetMapping
-    public ResponseEntity<List<RentalDTO>> getRentals() {
-        List<Rental> rentals = rentalService.getAllRentals();
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<RentalsResponse> getRentals() {
+        List<Rental> rentals = rentalService.getAllRentals();  // Récupère les locations depuis le service
+        RentalsResponse rentalsResponse = new RentalsResponse();  // Crée une réponse pour les locations
+        List<RentalDTO> rentalsDto = new ArrayList<>();
 
         if (rentals != null && !rentals.isEmpty()) {
-            // Utilisation de map pour transformer chaque Rental en RentalDTO et collecter le résultat dans une liste
-            List<RentalDTO> rentalsDto = rentals.stream()
-                    .map(rental -> rentalService.convertToDTO(rental)) // Convertit chaque Rental en RentalDTO
-                    .collect(Collectors.toList()); // Rassemble le résultat dans une nouvelle liste
+            rentalsDto = rentals.stream()
+                    .map(rental -> rentalService.convertToDTO(rental))
+                    .collect(Collectors.toList());
+        }
 
-            return ResponseEntity.status(HttpStatus.OK).body(rentalsDto);
+        if (!rentalsDto.isEmpty()) {
+            rentalsResponse.setRentals(rentalsDto);
+            return ResponseEntity.status(HttpStatus.OK).body(rentalsResponse);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
