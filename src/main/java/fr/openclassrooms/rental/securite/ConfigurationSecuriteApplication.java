@@ -36,6 +36,7 @@ public class ConfigurationSecuriteApplication {
                                                 .requestMatchers(POST,"/auth/login").permitAll()
                                                 .requestMatchers(POST,"/auth/me").permitAll()
                                                 .requestMatchers(POST, "/rentals/**").permitAll()
+                                                .requestMatchers(POST,"/messages").permitAll()
                                                 .requestMatchers(GET, "/rentals/**").permitAll()
                                                 .requestMatchers( GET, "/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
                                                 .anyRequest().authenticated()
