@@ -49,8 +49,35 @@ public class RentalService {
         return rentalDTO;
     }
 
-    public Rental getRentalById (Integer id){
+    public Rental getRentalById(Integer id) {
         return rentalRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("Aucun logement ne corespond à cet identifiant"));
+                .orElseThrow(() -> new EntityNotFoundException("Rental not found with id: " + id));
+    }
+
+
+    public Rental updateRental(Integer id, Rental updateRental) {
+        // Recherche de l'entité existante
+        Rental rental = rentalRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Rental not found with id: " + id));
+
+        // Mise à jour des champs
+        if (updateRental.getName() != null) {
+            rental.setName(updateRental.getName());
+        }
+        if (updateRental.getSurface() != null) {
+            rental.setSurface(updateRental.getSurface());
+        }
+        if (updateRental.getPrice() != null) {
+            rental.setPrice(updateRental.getPrice());
+        }
+        if (updateRental.getPicture() != null) {
+            rental.setPicture(updateRental.getPicture());
+        }
+        if (updateRental.getDescription() != null) {
+            rental.setDescription(updateRental.getDescription());
+        }
+
+        // Sauvegarde de l'entité mise à jour
+        return rentalRepository.save(rental);
     }
 }

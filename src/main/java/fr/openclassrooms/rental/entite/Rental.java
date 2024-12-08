@@ -24,8 +24,12 @@ public class Rental {
     private String name;
     private String surface;
     private String price;
+    @Lob
+    private String picture;
+    @Lob
+    private String description;
     @CreatedDate
-    @Column(nullable = false, updatable = false) // Non modifiable après création
+    @Column(nullable = false, updatable = false)
     private LocalDateTime created_at;
 
     @LastModifiedDate
@@ -40,10 +44,21 @@ public class Rental {
         this.id = id;
     }
 
-    @Lob
-    private String picture;
-    @Lob
-    private String description;
+    public LocalDateTime getCreated_at() {
+        return created_at;
+    }
+
+    public void setCreated_at(LocalDateTime created_at) {
+        this.created_at = created_at;
+    }
+
+    public LocalDateTime getUpdated_at() {
+        return updated_at;
+    }
+
+    public void setUpdated_at(LocalDateTime updated_at) {
+        this.updated_at = updated_at;
+    }
 
     public String getName() {
         return name;
@@ -75,22 +90,6 @@ public class Rental {
 
     public void setPicture(String picture) {
         this.picture = picture;
-    }
-
-    public LocalDateTime getCreated_at() {
-        return created_at;
-    }
-
-    public void setCreated_at(LocalDateTime created_at) {
-        this.created_at = created_at;
-    }
-
-    public LocalDateTime getUpdated_at() {
-        return updated_at;
-    }
-
-    public void setUpdated_at(LocalDateTime updated_at) {
-        this.updated_at = updated_at;
     }
 
     public String getDescription() {
