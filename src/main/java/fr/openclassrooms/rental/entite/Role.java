@@ -1,7 +1,7 @@
 package fr.openclassrooms.rental.entite;
 
 
-import fr.openclassrooms.rental.enumm.TypeDeRole;
+import fr.openclassrooms.rental.enumer.TypeDeRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,6 +1,7 @@
 package fr.openclassrooms.rental.controller;
 
 import fr.openclassrooms.rental.dto.RentalDTO;
+import fr.openclassrooms.rental.dto.UtilisateurDTO;
 import fr.openclassrooms.rental.entite.Rental;
 import fr.openclassrooms.rental.entite.Utilisateur;
 import fr.openclassrooms.rental.models.RentalsResponse;

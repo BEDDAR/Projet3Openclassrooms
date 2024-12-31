@@ -31,9 +31,15 @@ public class Utilisateur implements UserDetails {
     private String password;
     private String name;
     private String email;
+    @OneToOne(cascade = CascadeType.ALL)
+    private Role role;
+
     @CreatedDate
     @Column(nullable = false, updatable = false) // Non modifiable après création
     private LocalDateTime created_at;
+    @LastModifiedDate
+    @Column(nullable = false)
+    private LocalDateTime updated_at;
 
     public LocalDateTime getCreated_at() {
         return created_at;
@@ -51,9 +57,6 @@ public class Utilisateur implements UserDetails {
         this.updated_at = updated_at;
     }
 
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updated_at;
     public Integer getId() {
         return id;
     }
@@ -61,9 +64,6 @@ public class Utilisateur implements UserDetails {
     public void setId(Integer id) {
         this.id = id;
     }
-
-    @OneToOne(cascade = CascadeType.ALL)
-    private Role role;
 
     public void setPassword(String password) {
         this.password = password;

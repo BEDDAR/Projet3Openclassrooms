@@ -1,4 +1,4 @@
-package fr.openclassrooms.rental.enumm;
+package fr.openclassrooms.rental.enumer;
 
 public enum TypeDeRole {
     UTILISATEUR,
